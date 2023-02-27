@@ -1,5 +1,2 @@
-console.log("coucou");
-console.log("coucou");
-console.log("coucou");
-console.log("coucou");
-console.log("coucou");
+console.log("Coucou");
+console.log("Salut les amis");
