@@ -14,9 +14,9 @@ app.listen({ port: process.env.PORT as any, host: process.env.HOST }, () => {
 });
 
 app.get("/", () => {
-  return "Bienvenue sur mon serveur";
+  return "Bienvenue sur mon serveur!";
 });
 
 app.get("/hello", () => {
-  return "Bonjour tout le monde";
+  return "Bonjour tout le monde!";
 });
