@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch:typescript": "npx tsc --watch",
     "watch:nodemon": "npx nodemon -r dotenv/config dist/index.js",
-    "start": "npx concurrently npm:watch:typescript npm:watch:nodemon"
+    "start:nodemon": "npx concurrently npm:watch:typescript npm:watch:nodemon"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "fastify": "^4.13.0"
   }
 }
