@@ -3,3 +3,23 @@ GET http://127.0.0.1:4646
 GET http://127.0.0.1:4646/hello
 ###
 GET http://127.0.0.1:4646/eleves
+###
+GET http://127.0.0.1:4646/calc/add/10/5
+###
+GET http://127.0.0.1:4646/calc/sub/10/5
+###
+GET http://127.0.0.1:4646/calc/mul/10/5
+###
+GET http://127.0.0.1:4646/calc/div/10/5
+###
+GET http://127.0.0.1:4646/calc/div/10/0
+
+###
+POST http://127.0.0.1:4646/calculate
+operation: sub
+Content-Type: application/json
+
+{
+  "x": 30,
+  "y": 26
+}
