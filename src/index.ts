@@ -20,3 +20,34 @@ app.get("/", () => {
 app.get("/hello", () => {
   return "Bonjour tout le monde!";
 });
+
+app.get("/eleves", (request, response) => {
+  // Ajouter un entête http
+  response.header("Developed-With", "fastify");
+  return [
+    {
+      id: "1",
+      nom: "john",
+      prenom: "john",
+      age: "32",
+    },
+    {
+      id: "2",
+      nom: "john",
+      prenom: "rose",
+      age: "36",
+    },
+    {
+      id: "3",
+      nom: "john",
+      prenom: "jane",
+      age: "40",
+    },
+    {
+      id: "4",
+      nom: "john",
+      prenom: "jean",
+      age: "38",
+    },
+  ];
+});
