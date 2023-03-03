@@ -27,11 +27,11 @@ app.get("/testmongo", async () => {
 
 app.register(fastifyMongo, {
   // Nous devons spécifier l'url de connnection à la base de données
-  // url: "mongodb+srv://redred:mrn2354596@mydatabase.iiq0ky9.mongodb.net/?retryWrites=true&w=majority",
+
   url: process.env.MONGO_URL,
 
   // Nous devons aussi spécifier la base de données :
-  // database: "Mydatabase",
+
   database: process.env.MONGO_DATABASE,
 });
 
