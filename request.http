@@ -16,10 +16,73 @@ GET http://127.0.0.1:4646/calc/div/10/0
 
 ###
 POST http://127.0.0.1:4646/calculate
+operation: add
+Content-Type: application/json
+
+{
+  "x": 10,
+  "y": 2
+}
+###
+POST http://127.0.0.1:4646/calculate
 operation: sub
 Content-Type: application/json
 
 {
-  "x": 30,
-  "y": 26
+  "x": 10,
+  "y": 2
 }
+###
+POST http://127.0.0.1:4646/calculate
+operation: mul
+Content-Type: application/json
+
+{
+  "x": 10,
+  "y": 2
+}
+###
+POST http://127.0.0.1:4646/calculate
+operation: div
+Content-Type: application/json
+
+{
+  "x": 10,
+  "y": 2
+}
+
+###
+
+GET http://127.0.0.1:4646/testmongo
+
+###
+
+GET http://127.0.0.1:4646/calculatrice/results
+
+###
+
+POST http://127.0.0.1:4646/pizzas
+Content-Type: application/json
+
+{
+  "name": "calzone",
+  "price": 13.5,
+  "description": "Très bonne pizza !"
+}
+
+###
+
+PATCH http://127.0.0.1:4646/pizzas/6402214c8e49ad2b04f647a5
+Content-Type: application/json
+
+{
+  "price": 8.9
+}
+
+###
+
+DELETE http://127.0.0.1:4646/pizzas/6402214c8e49ad2b04f647a5
+
+###
+
+GET http://127.0.0.1:4646/pizzas

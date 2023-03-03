@@ -1,91 +1,113 @@
 import { FastifyInstance } from "fastify";
 
-export default async function calculatriceRoute(app: FastifyInstance) {
-  // Création d'un type pour notre route
-  type CalcRoute = {
-    Params: {
-      x: string;
-      y: string;
-    };
-  };
-
+/**
+ * Plugin contenant toute les routes concernant la calculatrice
+ */
+export default async function calculatriceRoutes(app: FastifyInstance) {
   // Création d'une route permettant d'additionner 2 nombre
-  app.get<CalcRoute>("/calc/add/:x/:y", (request) => {
+  app.get<CalcRoute>("/calc/add/:x/:y", async (request) => {
+    // Récupérer les paramètres
+    const x = parseFloat(request.params.x);
+    const y = parseFloat(request.params.y);
+
+    // Résulat de la calculatrice
+    const result = {
+      result: x + y,
+      x: x,
+      y: y,
+      operation: "add",
+    };
+
+    // Enreigistré ce « result » dans la collection `calulcalatrice` de
+    // votre mongodb !
+    await app.mongo.db?.collection("calculatrices").insertOne(result);
+
+    // On retourne l'objet de résultat
+    return result;
+  });
+
+  // Création d'une route permettant de soustraire 2 nombres
+  app.get<CalcRoute>("/calc/sub/:x/:y", async (request) => {
     // Récupérer les paramètres
     const x = parseFloat(request.params.x);
     const y = parseFloat(request.params.y);
 
     // On retourne l'objet de résultat
-    return {
-      result: x + y,
-      x: x,
-      y: y,
-      operation: "add(x+y)",
-    };
-  });
-
-  // Création d'une route permettant de soustraire 2 nombres
-  app.get<CalcRoute>("/calc/sub/:x/:y", (request) => {
-    const x = parseFloat(request.params.x);
-    const y = parseFloat(request.params.y);
-    return {
+    const result = {
       result: x - y,
       x: x,
       y: y,
-      operation: "sub(x-y)",
+      operation: "sub",
     };
+
+    // On enregistre dans mongodb
+    await app.mongo.db?.collection("calculatrices").insertOne(result);
+
+    // On retourne le résultat
+    return result;
   });
-  // Création d'une route permettant de multiplier 2 nombres
-  app.get<CalcRoute>("/calc/mul/:x/:y", (request) => {
+
+  // Création d'une route permettant de soustraire 2 nombres
+  app.get<CalcRoute>("/calc/mul/:x/:y", async (request) => {
+    // Récupérer les paramètres
     const x = parseFloat(request.params.x);
     const y = parseFloat(request.params.y);
-    return {
+
+    // On retourne l'objet de résultat
+    const result = {
       result: x * y,
       x: x,
       y: y,
-      operation: "mul(x*y)",
+      operation: "mul",
     };
+
+    // On enregistre dans mongodb
+    await app.mongo.db?.collection("calculatrices").insertOne(result);
+
+    // On retourne le résultat
+    return result;
   });
 
-  // Création d'une route permettant de diviser 2 nombres
-  app.get<CalcRoute>("/calc/div/:x/:y", (request, response) => {
+  // Création d'une route permettant de soustraire 2 nombres
+  app.get<CalcRoute>("/calc/div/:x/:y", async (request, response) => {
+    // Récupérer les paramètres
     const x = parseFloat(request.params.x);
     const y = parseFloat(request.params.y);
+
     if (y === 0) {
       response.code(400);
+
       return {
-        error: "divistion pae zero!!!",
-        message: "Attention! la division par zero est impossible!",
+        error: "division par 0",
+        message: "Il est impossible de diviser un nombre par 0",
       };
     }
 
-    return {
+    // On retourne l'objet de résultat
+    const result = {
       result: x / y,
       x: x,
       y: y,
-      operation: "div (x/y)",
+      operation: "div",
     };
+
+    // On enregistre dans mongodb
+    await app.mongo.db?.collection("calculatrices").insertOne(result);
+
+    // On retourne le résultat
+    return result;
   });
 
-  type CalculateRoute = {
-    Headers: {
-      operation: string;
-    };
-    Body: {
-      x: number;
-      y: number;
-    };
-  };
-
-  app.post<CalculateRoute>("/calculate", (request, response) => {
+  app.post<CalculateRoute>("/calculate", async (request, response) => {
     // Récupére l'opération
-    const operation = request.headers.operation;
+    const operation: any = request.headers.operation;
     // ON récupére x et y
     const x = request.body.x;
     const y = request.body.y;
+    let result: any = null;
 
     if (operation === "add") {
-      return {
+      result = {
         result: x + y,
         x: x,
         y: y,
@@ -94,7 +116,7 @@ export default async function calculatriceRoute(app: FastifyInstance) {
     }
 
     if (operation === "sub") {
-      return {
+      result = {
         result: x - y,
         x: x,
         y: y,
@@ -103,7 +125,7 @@ export default async function calculatriceRoute(app: FastifyInstance) {
     }
 
     if (operation === "mul") {
-      return {
+      result = {
         result: x * y,
         x: x,
         y: y,
@@ -121,7 +143,7 @@ export default async function calculatriceRoute(app: FastifyInstance) {
         };
       }
 
-      return {
+      result = {
         result: x / y,
         x: x,
         y: y,
@@ -129,11 +151,44 @@ export default async function calculatriceRoute(app: FastifyInstance) {
       };
     }
 
-    response.code(400);
+    if (!result) {
+      response.code(400);
 
-    return {
-      error: "invalide operation",
-      message: `Je ne connais l'opération ${operation} :/`,
-    };
+      return {
+        error: "invalide operation",
+        message: `Je ne connais l'opération ${operation} :/`,
+      };
+    }
+
+    await app.mongo.db?.collection("calculatrices").insertOne(result);
+
+    return result;
+  });
+
+  // Affiche tout les résultats enregistré dans la base de données
+  app.get("/calculatrice/results", async () => {
+    const collection = await app.mongo.db
+      ?.collection("calculatrices")
+      .find()
+      .toArray();
+
+    return collection;
   });
 }
+
+export type CalcRoute = {
+  Params: {
+    x: string;
+    y: string;
+  };
+};
+
+export type CalculateRoute = {
+  Headers: {
+    operation: string;
+  };
+  Body: {
+    x: number;
+    y: number;
+  };
+};

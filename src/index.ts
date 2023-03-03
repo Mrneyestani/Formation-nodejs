@@ -1,60 +1,57 @@
 import fastify from "fastify";
+import fastifyMongo from "@fastify/mongodb";
 import fastifyPlugin from "fastify-plugin";
 import calculatriceRoute from "./routes/calculatrice";
+import testouilleRoutes from "./routes/testouills";
+import pizzeriaRoutes from "./routes/pazzeria";
 
 console.log(`NODE_ENV = ${process.env.NODE_ENV}`);
 console.log(`TZ = ${process.env.TZ}`);
 console.log(`HOST = ${process.env.HOST}`);
 console.log(`PORT = ${process.env.PORT}`);
 
-const app = fastify();
+const app = fastify({ logger: true });
 
 app.get("/", () => {
   return "Bienvenue sur mon serveur!";
 });
 
-app.get("/hello", () => {
-  return "Bonjour tout le monde!";
+// Route testant mongodb
+app.get("/testmongo", async () => {
+  await app.mongo.db?.collection("tests").insertOne({
+    message: "coucou les amis",
+  });
+
+  return "Mongodb à un nouveau document !";
 });
 
-app.get("/eleves", (request, response) => {
-  // Ajouter un entête http
-  response.header("Developed-With", "fastify");
-  return [
-    {
-      id: 1,
-      nom: "john",
-      prenom: "john",
-      age: 32,
-    },
-    {
-      id: 2,
-      nom: "john",
-      prenom: "rose",
-      age: 36,
-    },
-    {
-      id: 3,
-      nom: "john",
-      prenom: "jane",
-      age: 40,
-    },
-    {
-      id: 4,
-      nom: "john",
-      prenom: "jean",
-      age: 38,
-    },
-  ];
+app.register(fastifyMongo, {
+  // Nous devons spécifier l'url de connnection à la base de données
+  // url: "mongodb+srv://redred:mrn2354596@mydatabase.iiq0ky9.mongodb.net/?retryWrites=true&w=majority",
+  url: process.env.MONGO_URL,
+
+  // Nous devons aussi spécifier la base de données :
+  // database: "Mydatabase",
+  database: process.env.MONGO_DATABASE,
 });
+
+// enregistremet de mon premier plugin
+app.register(fastifyPlugin(testouilleRoutes));
 
 // enregistremet de mon premier plugin
 app.register(fastifyPlugin(calculatriceRoute));
 
+// Enregistrement du plugin pizzeria
+app.register(fastifyPlugin(pizzeriaRoutes));
+
 // On écoute une porte de notre ordinateur
-app.listen({ port: process.env.PORT as any, host: process.env.HOST }, () => {
-  // Petit fonction qui se déclenche lorsque notre serveur se met à écouter la porte
-  console.log(
-    `Le serveur http est prêt sur l'address : http://${process.env.HOST}:${process.env.PORT}"`
-  );
-});
+app.listen(
+  { port: process.env.PORT as any, host: process.env.HOST },
+  (error) => {
+    console.error(error);
+    // Petit fonction qui se déclenche lorsque notre serveur se met à écouter la porte
+    console.log(
+      `Le serveur http est prêt sur l'address : http://${process.env.HOST}:${process.env.PORT}"`
+    );
+  }
+);
